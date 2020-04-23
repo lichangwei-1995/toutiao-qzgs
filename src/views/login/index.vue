@@ -84,6 +84,9 @@ export default {
           message: '恭喜你，登陆成功',
           type: 'success'
         })
+        this.$router.push({
+          name: 'home'
+        })
         // 显示登录消息时关闭loading等待效果
         this.loading = false
       }).catch(err => {
