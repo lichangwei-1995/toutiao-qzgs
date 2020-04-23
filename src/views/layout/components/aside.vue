@@ -6,7 +6,9 @@
     @open="handleOpen"
     @close="handleClose"
     text-color="#fff"
-    active-text-color="#f00">
+    active-text-color="#f00"
+    :collapse="isCollapse"
+    >
     <el-menu-item index="/">
       <i class="el-icon-s-home"></i>
       <span slot="title">首页</span>
@@ -41,6 +43,12 @@
 <script>
 export default {
   name: 'AppAside',
+  props: ['is-collapse'],
+  data() {
+    return {
+      // isCollapse: false
+    }
+  },
   methods: {
     handleOpen(key, keyPath) {
       console.log(key, keyPath)

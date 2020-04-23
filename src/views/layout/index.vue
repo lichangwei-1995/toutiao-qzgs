@@ -1,12 +1,19 @@
 <template>
   <el-container class="layout-container">
-    <el-aside class="aside" width="200px">
-      <app-aside class="aside-meun"></app-aside>
+    <el-aside class="aside" width="auto">
+      <app-aside class="aside-meun" :is-collapse="isCollapse"></app-aside>
     </el-aside>
     <el-container>
       <el-header class="header">
         <div>
-          <i class="el-icon-s-fold"></i>
+          <i
+            :class="{
+              'el-icon-s-fold': isCollapse,
+              'el-icon-s-unfold': !isCollapse
+            }"
+            @click="isCollapse = !isCollapse"
+            >
+          </i>
           <span class="company-name">全职高手之巅峰荣耀</span>
         </div>
         <el-dropdown>
@@ -39,7 +46,8 @@ export default {
   name: 'LayoutIndex',
   data () {
     return {
-      user: {}
+      user: {},
+      isCollapse: false
     }
   },
   components: {
@@ -79,10 +87,6 @@ export default {
   }
   .el-icon-arrow-down {
     font-size: 12px;
-  }
-  .el-icon-s-fold {
-    font-size: 24px;
-    vertical-align: middle;
   }
   .header {
     display: flex;
