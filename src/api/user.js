@@ -9,3 +9,14 @@ export const login = data => {
     data
   })
 }
+
+// 获取用户信息
+export const getUserProfile = () => {
+  return request({
+    method: 'GET',
+    url: '/mp/v1_0/user/profile',
+    headers: {
+      Authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTkwODgwODQsInVzZXJfaWQiOjEsInJlZnJlc2giOmZhbHNlLCJ2ZXJpZmllZCI6dHJ1ZX0.L8lnjjklj9NayZ4SbSXxIdP-_nU0hj8KGmubC_Hn5X0'
+    }
+  })
+}

@@ -11,8 +11,8 @@
         </div>
         <el-dropdown>
           <div class="avatar-wrap">
-            <img class="avatar" src="" alt="">
-            <span>叶秋</span>
+            <img class="avatar" :src="user.photo" alt="">
+            <span>{{user.name}}</span>
             <span class="el-dropdown-link">
               <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
@@ -33,6 +33,8 @@
 
 <script>
 import AppAside from './components/aside'
+import { getUserProfile } from '@/api/user'
+
 export default {
   name: 'LayoutIndex',
   data () {
@@ -41,7 +43,17 @@ export default {
   components: {
     AppAside
   },
-  methods: {}
+  created () {
+    this.loadUserProfile()
+  },
+  methods: {
+    loadUserProfile () {
+      getUserProfile().then(res => {
+        console.log(res)
+        this.user = res.data.data
+      })
+    }
+  }
 }
 </script>
 
