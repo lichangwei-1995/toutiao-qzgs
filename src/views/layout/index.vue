@@ -38,7 +38,9 @@ import { getUserProfile } from '@/api/user'
 export default {
   name: 'LayoutIndex',
   data () {
-    return {}
+    return {
+      user: {}
+    }
   },
   components: {
     AppAside
@@ -68,7 +70,6 @@ export default {
   .aside {
     background: #002033;
     .aside-meun {
-      background: #002033;
       height: 100%;
     }
   }

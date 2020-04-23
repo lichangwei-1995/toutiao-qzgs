@@ -12,11 +12,14 @@ export const login = data => {
 
 // 获取用户信息
 export const getUserProfile = () => {
+  // 取出本地储存的token json.parse方法还原成对象
+  const user = JSON.parse(window.localStorage.getItem('user'))
+  console.log(user)
   return request({
     method: 'GET',
     url: '/mp/v1_0/user/profile',
     headers: {
-      Authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTkwODgwODQsInVzZXJfaWQiOjEsInJlZnJlc2giOmZhbHNlLCJ2ZXJpZmllZCI6dHJ1ZX0.L8lnjjklj9NayZ4SbSXxIdP-_nU0hj8KGmubC_Hn5X0'
+      Authorization: `Bearer ${user.token}`
     }
   })
 }

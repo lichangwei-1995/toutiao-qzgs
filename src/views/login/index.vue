@@ -89,6 +89,8 @@ export default {
         })
         // 显示登录消息时关闭loading等待效果
         this.loading = false
+        // 将请求返回的数据存储到本地储存中 本地储存只能储存字符串 所以要转成josn格式
+        window.localStorage.setItem('user', JSON.stringify(res.data.data))
       }).catch(err => {
         console.log(err)
         this.$message.error('登陆失败,请检查手机号或验证码')

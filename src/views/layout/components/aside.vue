@@ -2,10 +2,11 @@
   <el-menu
     default-active="2"
     class="el-menu-vertical-demo"
+    background-color="#002033"
     @open="handleOpen"
     @close="handleClose"
     text-color="#fff"
-    active-text-color="#ffd04b">
+    active-text-color="#f00">
     <el-menu-item index="/">
       <i class="el-icon-s-home"></i>
       <span slot="title">首页</span>
