@@ -7,6 +7,23 @@ const request = axios.create({
 })
 
 // 请求拦截器
+request.interceptors.request.use(
+  // 所有请求都会经过这里
+  function (config) {
+    console.log(config)
+    // 统一设置token
+    const user = JSON.parse(window.localStorage.getItem('user'))
+
+    if (user) {
+      config.headers.Authorization = `Bearer ${user.token}`
+    }
+    return config
+  },
+  // 请求失败会经过这里
+  function (error) {
+    return Promise.reject(error)
+  }
+)
 
 // 响应拦截器
 

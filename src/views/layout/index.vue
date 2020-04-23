@@ -51,7 +51,7 @@ export default {
   methods: {
     loadUserProfile () {
       getUserProfile().then(res => {
-        console.log(res)
+        // console.log(res)
         this.user = res.data.data
       })
     }
