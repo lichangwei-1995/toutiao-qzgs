@@ -1,6 +1,6 @@
 <template>
   <div class="article-container">
-    <el-card class="box-card">
+    <el-card class="box-card filter-card">
       <div slot="header" class="clearfix">
         <el-breadcrumb separator="/">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
@@ -38,45 +38,70 @@
         </el-form-item>
       </el-form>
     </el-card>
-
+    <!-- 数据列表 -->
     <el-card class="box-card">
       <div slot="header" class="clearfix">
         根据筛选条件共查询到 46147 条结果：
       </div>
       <el-table
-        :data="tableData"
+        :data="articles"
         stripe
         style="width: 100%">
         <el-table-column
           prop="date"
-          label="封面"
-          width="180">
+          label="封面">
         </el-table-column>
         <el-table-column
-          prop="name"
-          label="标题"
-          width="180">
+          prop="title"
+          label="标题">
         </el-table-column>
         <el-table-column
-          prop="date"
-          label="状态"
-          width="180">
+          prop="status"
+          label="状态">
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.status === 0">草稿</el-tag>
+            <el-tag v-else-if="scope.row.status === 1">待审核</el-tag>
+            <el-tag v-else-if="scope.row.status === 2">审核成功</el-tag>
+            <el-tag v-else-if="scope.row.status === 3">审核失败</el-tag>
+            <el-tag v-else-if="scope.row.status === 4">已删除</el-tag>
+          </template>
         </el-table-column>
         <el-table-column
-          prop="date"
-          label="发布时间"
-          width="180">
+          prop="pubdate"
+          label="发布时间">
         </el-table-column>
-        <el-table-column
-          prop="address"
-          label="操作">
+        <el-table-column label="操作">
+          <template>
+            <el-button
+              size="mini"
+              type="primary"
+              icon="el-icon-edit"
+              circle
+            >
+            </el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              icon="el-icon-delete"
+              circle
+              >
+              </el-button>
+          </template>
         </el-table-column>
       </el-table>
+      <!-- 分页 -->
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :total="1000">
+      </el-pagination>
     </el-card>
   </div>
 </template>
 
 <script>
+import { getArticles } from '@/api/article'
+
 export default {
   name: 'ArticleIndex',
   components: {},
@@ -110,14 +135,23 @@ export default {
         name: '王小虎',
         address: '上海市普陀区金沙江路 1516 弄'
       }],
+      articles: [],
       value1: ''
     }
   },
   computed: {},
   watch: {},
-  created () {},
+  created () {
+    this.loadgetArticles()
+  },
   mounted () {},
   methods: {
+    loadgetArticles() {
+      getArticles().then(res => {
+        console.log(res)
+        this.articles = res.data.data.results
+      })
+    },
     onSubmit() {
       console.log('submit!')
     }
@@ -126,5 +160,7 @@ export default {
 </script>
 
 <style scoped lang="less">
-
+  .filter-card {
+    margin-bottom: 20px;
+  }
 </style>
