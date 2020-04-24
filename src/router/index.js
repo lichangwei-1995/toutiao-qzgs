@@ -5,6 +5,8 @@ import Login from '@/views/login/'
 // home首页
 import Home from '@/views/home/'
 import Layout from '@/views/layout/'
+// 内容管理
+import Article from '@/views/article/'
 
 Vue.use(VueRouter)
 
@@ -22,6 +24,11 @@ const routes = [
         path: '',
         name: 'home',
         component: Home
+      },
+      {
+        path: '/article',
+        name: 'article',
+        component: Article
       }
     ]
   }

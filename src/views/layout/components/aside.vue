@@ -6,14 +6,15 @@
     @open="handleOpen"
     @close="handleClose"
     text-color="#fff"
-    active-text-color="#f00"
+    active-text-color="#ffd04b"
+    router
     :collapse="isCollapse"
     >
     <el-menu-item index="/">
       <i class="el-icon-s-home"></i>
       <span slot="title">首页</span>
     </el-menu-item>
-    <el-menu-item index="/airtcle">
+    <el-menu-item index="/article">
       <i class="el-icon-menu"></i>
       <span slot="title">内容管理</span>
     </el-menu-item>
