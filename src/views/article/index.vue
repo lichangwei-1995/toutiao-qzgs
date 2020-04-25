@@ -19,7 +19,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="频道">
-          <el-select v-model="form.region" placeholder="请选择频道">
+          <el-select v-model="channelId" placeholder="请选择频道">
             <el-option
               :label="channel.name"
               :value="channel.id"
@@ -142,6 +142,7 @@ export default {
       pageSize: 20,
       status: null,
       channels: [],
+      channelId: null,
       value1: ''
     }
   },
@@ -157,7 +158,8 @@ export default {
       getArticles({
         page,
         per_page: this.pageSize,
-        status: this.status
+        status: this.status,
+        channel_id: this.channelId
       }).then(res => {
         // console.log(res)
         this.articles = res.data.data.results
@@ -186,6 +188,7 @@ export default {
     margin-bottom: 20px;
   }
   .article-cover {
+    width: 130px;
     height: 100px;
   }
 </style>
