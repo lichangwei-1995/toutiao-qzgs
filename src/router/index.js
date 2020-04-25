@@ -7,6 +7,8 @@ import Home from '@/views/home/'
 import Layout from '@/views/layout/'
 // 内容管理
 import Article from '@/views/article/'
+// 发布文章
+import Publish from '@/views/publish/'
 
 Vue.use(VueRouter)
 
@@ -29,6 +31,11 @@ const routes = [
         path: '/article',
         name: 'article',
         component: Article
+      },
+      {
+        path: '/publish',
+        name: 'publish',
+        component: Publish
       }
     ]
   }

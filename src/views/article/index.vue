@@ -41,7 +41,7 @@
     <!-- 数据列表 -->
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        根据筛选条件共查询到 46147 条结果：
+        根据筛选条件共查询到 {{totalCount}} 条结果：
       </div>
       <el-table
         :data="articles"
@@ -50,6 +50,10 @@
         <el-table-column
           prop="date"
           label="封面">
+          <template slot-scope="scope">
+            <img v-if="scope.row.cover.images[0]" class="article-cover" :src="scope.row.cover.images[0]" alt="">
+            <img v-else class="article-cover" src="./mbno_img.jpg" alt="">
+          </template>
         </el-table-column>
         <el-table-column
           prop="title"
@@ -59,11 +63,11 @@
           prop="status"
           label="状态">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.status === 0">草稿</el-tag>
-            <el-tag v-else-if="scope.row.status === 1">待审核</el-tag>
+            <el-tag :type="articleStatus[scope.row.status].type">{{ articleStatus[scope.row.status].text }}</el-tag>
+            <!-- <el-tag v-else-if="scope.row.status === 1">待审核</el-tag>
             <el-tag v-else-if="scope.row.status === 2">审核成功</el-tag>
             <el-tag v-else-if="scope.row.status === 3">审核失败</el-tag>
-            <el-tag v-else-if="scope.row.status === 4">已删除</el-tag>
+            <el-tag v-else-if="scope.row.status === 4">已删除</el-tag> -->
           </template>
         </el-table-column>
         <el-table-column
@@ -93,7 +97,10 @@
       <el-pagination
         background
         layout="prev, pager, next"
-        :total="1000">
+        :total="totalCount"
+        @current-change="onCurrentChange"
+        :page-size="pageSize"
+      >
       </el-pagination>
     </el-card>
   </div>
@@ -118,42 +125,42 @@ export default {
         resource: '',
         desc: ''
       },
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }],
       articles: [],
+      articleStatus: [
+        { status: 0, text: '草稿', type: '' },
+        { status: 0, text: '待审核', type: 'info' },
+        { status: 0, text: '审核成功', type: 'success' },
+        { status: 0, text: '审核失败', type: 'warning' },
+        { status: 0, text: '已删除', type: 'danger' }
+      ],
+      totalCount: 0,
+      pageSize: 20,
       value1: ''
     }
   },
   computed: {},
   watch: {},
   created () {
-    this.loadgetArticles()
+    this.loadgetArticles(1)
   },
   mounted () {},
   methods: {
-    loadgetArticles() {
-      getArticles().then(res => {
+    loadgetArticles(page = 1) {
+      getArticles({
+        page,
+        per_page: this.pageSize
+      }).then(res => {
         console.log(res)
         this.articles = res.data.data.results
+        this.totalCount = res.data.data.total_count
       })
     },
     onSubmit() {
       console.log('submit!')
+    },
+
+    onCurrentChange(page) {
+      this.loadgetArticles(page)
     }
   }
 }
@@ -162,5 +169,8 @@ export default {
 <style scoped lang="less">
   .filter-card {
     margin-bottom: 20px;
+  }
+  .article-cover {
+    height: 100px;
   }
 </style>
