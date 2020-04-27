@@ -12,7 +12,13 @@
           <el-input v-model="article.title"></el-input>
         </el-form-item>
         <el-form-item label="内容">
-          <el-input type="textarea" v-model="article.content"></el-input>
+          <el-tiptap
+            v-model="article.content"
+            :extensions="extensions"
+            height="320"
+            placeholder="请输入文章内容"
+          >
+          </el-tiptap>
         </el-form-item>
         <el-form-item label="频道">
           <el-select v-model="article.channel_id" placeholder="请选择频道">
@@ -44,13 +50,71 @@
 
 <script>
 import { getArticleChannels, addArticle } from '@/api/article'
+import {
+  ElementTiptap,
+  Doc,
+  Text,
+  Paragraph,
+  Heading,
+  Bold,
+  Underline,
+  Italic,
+  Strike,
+  ListItem,
+  BulletList,
+  OrderedList,
+  TextColor,
+  FormatClear,
+  TextAlign,
+  Indent,
+  LineHeight,
+  Preview,
+  Image,
+  Fullscreen
+} from 'element-tiptap'
+// import element-tiptap 样式
+import 'element-tiptap/lib/index.css'
+import { unploadImages } from '@/api/image'
 
 export default {
   name: 'PublishIndex',
-  components: {},
+  components: {
+    'el-tiptap': ElementTiptap
+  },
   props: {},
   data () {
     return {
+      extensions: [
+        new Doc(),
+        new Text(),
+        new Paragraph(),
+        new Heading({ level: 5 }),
+        new Bold({ bubble: true }), // 在气泡菜单中渲染菜单按钮
+        new Underline(),
+        new Italic(),
+        new Strike(),
+        new ListItem(),
+        new BulletList(),
+        new OrderedList(),
+        new TextColor(),
+        new FormatClear(),
+        new TextAlign(),
+        new Indent(),
+        new LineHeight(),
+        new Preview(),
+        new Image({
+          unploadRequest(file) {
+            const fd = new FormData()
+            console.log(file)
+            fd.append('image', file)
+            return unploadImages(fd).then(res => {
+              console.log(res)
+              return res.data.data.url
+            })
+          }
+        }),
+        new Fullscreen()
+      ],
       article: {
         title: '',
         content: '',

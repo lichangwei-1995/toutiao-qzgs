@@ -131,6 +131,7 @@
         :page-size="pageSize"
         class="article-pagination"
         :disabled="loading"
+        :current-page.sync="page"
       >
       </el-pagination>
     </el-card>
@@ -230,7 +231,10 @@ export default {
         type: 'warning'
       }).then(() => {
         deleteArticle(articleId.toString()).then(res => {
-          console.log(res)
+          // console.log(res)
+          // 删除成功重新渲染数据列表
+          // this.page -- 在第几页删除的数据就重新渲染当前页面
+          this.loadgetArticles(this.page)
         })
         this.$message({
           type: 'success',
