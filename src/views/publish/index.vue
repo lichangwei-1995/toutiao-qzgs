@@ -7,7 +7,7 @@
           <el-breadcrumb-item><a href="/">{{$route.query.id ? '修改文章' : '发布文章'}}</a></el-breadcrumb-item>
         </el-breadcrumb>
       </div>
-      <el-form ref="form" :model="article" :rules="rules" label-width="80px">
+      <el-form ref="publish-form" :model="article" :rules="rules" label-width="80px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="article.title"></el-input>
         </el-form-item>
@@ -133,14 +133,13 @@ export default {
       rules: {
         title: [
           { required: true, message: '请输入活动名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
         ],
         channel_id: [
           { required: true, message: '请选择频道', trigger: 'blur' }
         ],
         content: [
           {
-            // required: true, message: '请填写文章内容', trigger: 'change'
             // 自定义校验规则
             validator(rule, value, callback) {
               if (value === '<p></p>') {
@@ -149,7 +148,8 @@ export default {
                 callback()
               }
             }
-          }
+          },
+          { required: true, message: '请填写文章内容', trigger: 'change' }
         ]
       },
       channels: null
@@ -169,26 +169,33 @@ export default {
   methods: {
     // 发布文章
     onPublish(draft = false) {
-      // 判断是请求编辑内容还是直接发布内容
-      if (this.$route.query.id) {
-        editArticle(this.$route.query.id, this.article, draft).then(res => {
-          console.log(res)
-          this.$message({
-            message: `${draft ? '存入草稿' : '发布'}成功`,
-            type: 'success'
+      this.$refs['publish-form'].validate(valid => {
+        // 验证失败 阻止提交
+        if (!valid) {
+          return
+        }
+        // 验证成功 提交表单
+        // 判断是请求编辑内容还是直接发布内容
+        if (this.$route.query.id) {
+          editArticle(this.$route.query.id, this.article, draft).then(res => {
+            console.log(res)
+            this.$message({
+              message: `${draft ? '存入草稿' : '发布'}成功`,
+              type: 'success'
+            })
+            this.$router.push('/article')
           })
-          this.$router.push('/article')
-        })
-      } else {
-        addArticle(this.article, draft).then(res => {
-          // console.log(res)
-          this.$message({
-            message: `${draft ? '存入草稿' : '发布'}成功`,
-            type: 'success'
+        } else {
+          addArticle(this.article, draft).then(res => {
+            // console.log(res)
+            this.$message({
+              message: `${draft ? '存入草稿' : '发布'}成功`,
+              type: 'success'
+            })
+            this.$router.push('/article')
           })
-          this.$router.push('/article')
-        })
-      }
+        }
+      })
     },
     // 获取频道
     loadChannels() {
