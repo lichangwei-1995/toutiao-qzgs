@@ -9,6 +9,8 @@ import Layout from '@/views/layout/'
 import Article from '@/views/article/'
 // 发布文章
 import Publish from '@/views/publish/'
+// 素材管理
+import Fodder from '@/views/fodder/'
 
 Vue.use(VueRouter)
 
@@ -36,6 +38,11 @@ const routes = [
         path: '/publish',
         name: 'publish',
         component: Publish
+      },
+      {
+        path: '/fodder',
+        name: 'fodder',
+        component: Fodder
       }
     ]
   }
