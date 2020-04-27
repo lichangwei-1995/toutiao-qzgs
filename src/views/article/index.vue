@@ -109,6 +109,7 @@
               type="primary"
               icon="el-icon-edit"
               circle
+              @click="$router.push('/publish?id='+ scope.row.id)"
             >
             </el-button>
             <el-button
@@ -131,7 +132,7 @@
         :page-size="pageSize"
         class="article-pagination"
         :disabled="loading"
-        :current-page.sync="page"
+        current-page.sync="page"
       >
       </el-pagination>
     </el-card>
@@ -223,8 +224,8 @@ export default {
 
     // 删除文章
     onDeleteArticle(articleId) {
-      console.log(articleId)
-      console.log(articleId.toString())
+      // console.log(articleId)
+      // console.log(articleId.toString())
       this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

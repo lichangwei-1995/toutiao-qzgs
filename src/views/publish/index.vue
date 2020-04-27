@@ -4,14 +4,14 @@
       <div slot="header" class="clearfix">
         <el-breadcrumb separator="/">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item><a href="/">发布文章</a></el-breadcrumb-item>
+          <el-breadcrumb-item><a href="/">{{$route.query.id ? '修改文章' : '发布文章'}}</a></el-breadcrumb-item>
         </el-breadcrumb>
       </div>
-      <el-form ref="form" :model="article" label-width="80px">
-        <el-form-item label="标题">
+      <el-form ref="form" :model="article" :rules="rules" label-width="80px">
+        <el-form-item label="标题" prop="title">
           <el-input v-model="article.title"></el-input>
         </el-form-item>
-        <el-form-item label="内容">
+        <el-form-item label="内容" prop="content">
           <el-tiptap
             v-model="article.content"
             :extensions="extensions"
@@ -20,7 +20,7 @@
           >
           </el-tiptap>
         </el-form-item>
-        <el-form-item label="频道">
+        <el-form-item label="频道" prop="channel_id">
           <el-select v-model="article.channel_id" placeholder="请选择频道">
             <el-option
               :label="channel.name"
@@ -40,8 +40,8 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onPublish">发布</el-button>
-          <el-button>存为草稿</el-button>
+          <el-button type="primary" @click="onPublish(false)">发布</el-button>
+          <el-button @click="onPublish(true)">存为草稿</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -49,7 +49,12 @@
 </template>
 
 <script>
-import { getArticleChannels, addArticle } from '@/api/article'
+import {
+  getArticleChannels,
+  addArticle,
+  getArticle,
+  editArticle
+} from '@/api/article'
 import {
   ElementTiptap,
   Doc,
@@ -124,6 +129,29 @@ export default {
         },
         channel_id: null
       },
+      // 表单验证规则
+      rules: {
+        title: [
+          { required: true, message: '请输入活动名称', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ],
+        channel_id: [
+          { required: true, message: '请选择频道', trigger: 'blur' }
+        ],
+        content: [
+          {
+            // required: true, message: '请填写文章内容', trigger: 'change'
+            // 自定义校验规则
+            validator(rule, value, callback) {
+              if (value === '<p></p>') {
+                callback(new Error('请填写文章内容'))
+              } else {
+                callback()
+              }
+            }
+          }
+        ]
+      },
       channels: null
     }
   },
@@ -131,18 +159,63 @@ export default {
   watch: {},
   created () {
     this.loadChannels()
+
+    // 如果路由中带有id 则请求展示文章内容
+    if (this.$route.query.id) {
+      this.loadArticle()
+    }
   },
   mounted () {},
   methods: {
-    onPublish() {
-      addArticle(this.article).then(res => {
-        console.log(res)
-      })
+    // 发布文章
+    onPublish(draft = false) {
+      // 判断是请求编辑内容还是直接发布内容
+      if (this.$route.query.id) {
+        editArticle(this.$route.query.id, this.article, draft).then(res => {
+          console.log(res)
+          this.$message({
+            message: `${draft ? '存入草稿' : '发布'}成功`,
+            type: 'success'
+          })
+          this.$router.push('/article')
+        })
+      } else {
+        addArticle(this.article, draft).then(res => {
+          // console.log(res)
+          this.$message({
+            message: `${draft ? '存入草稿' : '发布'}成功`,
+            type: 'success'
+          })
+          this.$router.push('/article')
+        })
+      }
     },
+    // 获取频道
     loadChannels() {
       getArticleChannels().then(res => {
         this.channels = res.data.data.channels
       })
+    },
+    // 获取指定文章内容
+    loadArticle() {
+      // console.log(111)
+      getArticle(this.$route.query.id).then(res => {
+        // console.log(res)
+        this.article = res.data.data
+      })
+    },
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          alert('submit!')
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields()
     }
   }
 }
