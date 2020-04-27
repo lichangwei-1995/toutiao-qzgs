@@ -15,21 +15,26 @@
           <el-input type="textarea" v-model="article.content"></el-input>
         </el-form-item>
         <el-form-item label="频道">
-          <el-select placeholder="请选择频道">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
+          <el-select v-model="article.channel_id" placeholder="请选择频道">
+            <el-option
+              :label="channel.name"
+              :value="channel.id"
+              v-for="(channel, index) in channels"
+              :key="index"
+            >
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="封面">
           <el-radio-group v-model="article.cover.type">
-            <el-radio label="单图"></el-radio>
-            <el-radio label="三图"></el-radio>
-            <el-radio label="无图"></el-radio>
-            <el-radio label="自动"></el-radio>
+            <el-radio :label="1">单图</el-radio>
+            <el-radio :label="3">三图</el-radio>
+            <el-radio :label="0">无图</el-radio>
+            <el-radio :label="-1">自动</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">发布</el-button>
+          <el-button type="primary" @click="onPublish">发布</el-button>
           <el-button>存为草稿</el-button>
         </el-form-item>
       </el-form>
@@ -38,6 +43,8 @@
 </template>
 
 <script>
+import { getArticleChannels, addArticle } from '@/api/article'
+
 export default {
   name: 'PublishIndex',
   components: {},
@@ -48,19 +55,30 @@ export default {
         title: '',
         content: '',
         cover: {
-          type: '0', // 封面类型
+          type: 0, // 封面类型
           images: []
-        }
-      }
+        },
+        channel_id: null
+      },
+      channels: null
     }
   },
   computed: {},
   watch: {},
-  created () {},
+  created () {
+    this.loadChannels()
+  },
   mounted () {},
   methods: {
-    onSubmit() {
-      console.log('submit!')
+    onPublish() {
+      addArticle(this.article).then(res => {
+        console.log(res)
+      })
+    },
+    loadChannels() {
+      getArticleChannels().then(res => {
+        this.channels = res.data.data.channels
+      })
     }
   }
 }

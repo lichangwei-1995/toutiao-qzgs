@@ -31,15 +31,24 @@
         </el-form-item>
         <el-form-item label="日期">
           <el-date-picker
-            v-model="value1"
+            v-model="rangeDate"
             type="daterange"
             range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期">
+            start-placeholder="开始时间"
+            end-placeholder="结束时间"
+            :default-time="['12:00:00']"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd">
           </el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="loadgetArticles(1)">筛选</el-button>
+          <el-button
+          :disabled="loading"
+            type="primary"
+            @click="loadgetArticles(1)"
+          >
+            筛选
+          </el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -49,6 +58,7 @@
         根据筛选条件共查询到 {{totalCount}} 条结果：
       </div>
       <el-table
+        v-loading="loading"
         :data="articles"
         stripe
         style="width: 100%">
@@ -56,8 +66,18 @@
           prop="date"
           label="封面">
           <template slot-scope="scope">
-            <img v-if="scope.row.cover.images[0]" class="article-cover" :src="scope.row.cover.images[0]" alt="">
-            <img v-else class="article-cover" src="./mbno_img.jpg" alt="">
+            <el-image
+              style="width: 100px; height: 100px"
+              :src="scope.row.cover.images[0]"
+              fit="cover"
+              lazy
+            >
+              <div slot="placeholder" class="image-slot">
+                加载中<span class="dot">...</span>
+              </div>
+            </el-image>
+            <!-- <img v-if="scope.row.cover.images[0]" class="article-cover" :src="scope.row.cover.images[0]" alt="">
+            <img v-else class="article-cover" src="./mbno_img.jpg" alt=""> -->
           </template>
         </el-table-column>
         <el-table-column
@@ -68,7 +88,9 @@
           prop="status"
           label="状态">
           <template slot-scope="scope">
-            <el-tag :type="articleStatus[scope.row.status].type">{{ articleStatus[scope.row.status].text }}</el-tag>
+            <el-tag :type="articleStatus[scope.row.status].type">
+              {{ articleStatus[scope.row.status].text }}
+            </el-tag>
             <!-- <el-tag v-else-if="scope.row.status === 1">待审核</el-tag>
             <el-tag v-else-if="scope.row.status === 2">审核成功</el-tag>
             <el-tag v-else-if="scope.row.status === 3">审核失败</el-tag>
@@ -77,10 +99,11 @@
         </el-table-column>
         <el-table-column
           prop="pubdate"
-          label="发布时间">
+          label="发布时间"
+        >
         </el-table-column>
         <el-table-column label="操作">
-          <template>
+          <template slot-scope="scope">
             <el-button
               size="mini"
               type="primary"
@@ -93,6 +116,7 @@
               type="danger"
               icon="el-icon-delete"
               circle
+              @click="onDeleteArticle(scope.row.id)"
               >
               </el-button>
           </template>
@@ -105,6 +129,8 @@
         :total="totalCount"
         @current-change="onCurrentChange"
         :page-size="pageSize"
+        class="article-pagination"
+        :disabled="loading"
       >
       </el-pagination>
     </el-card>
@@ -112,7 +138,12 @@
 </template>
 
 <script>
-import { getArticles, getArticleChannels } from '@/api/article'
+import {
+  getArticles,
+  getArticleChannels,
+  deleteArticle
+}
+  from '@/api/article'
 
 export default {
   name: 'ArticleIndex',
@@ -138,11 +169,13 @@ export default {
         { status: 0, text: '审核失败', type: 'warning' },
         { status: 0, text: '已删除', type: 'danger' }
       ],
-      totalCount: 0,
-      pageSize: 20,
+      totalCount: 0, // 总数据多少
+      pageSize: 10, // 每页显示条数
       status: null,
-      channels: [],
+      channels: [], // 频道筛选
       channelId: null,
+      rangeDate: null, // 日期筛选
+      loading: true, // loading加载
       value1: ''
     }
   },
@@ -155,20 +188,27 @@ export default {
   mounted () {},
   methods: {
     loadgetArticles(page = 1) {
+      // 让分页其他页面也展示loading加载中
+      this.loading = true
       getArticles({
         page,
         per_page: this.pageSize,
         status: this.status,
-        channel_id: this.channelId
+        channel_id: this.channelId,
+        begin_pubdate: this.rangeDate ? this.rangeDate[0] : null,
+        end_pubdate: this.rangeDate ? this.rangeDate[1] : null
       }).then(res => {
         // console.log(res)
         this.articles = res.data.data.results
         this.totalCount = res.data.data.total_count
+        // 关闭loading加载中
+        this.loading = false
       })
     },
+    // 获取频道
     loadChannels() {
       getArticleChannels().then(res => {
-        console.log(res)
+        // console.log(res)
         this.channels = res.data.data.channels
       })
     },
@@ -178,6 +218,30 @@ export default {
 
     onCurrentChange(page) {
       this.loadgetArticles(page)
+    },
+
+    // 删除文章
+    onDeleteArticle(articleId) {
+      console.log(articleId)
+      console.log(articleId.toString())
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteArticle(articleId.toString()).then(res => {
+          console.log(res)
+        })
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     }
   }
 }
@@ -190,5 +254,8 @@ export default {
   .article-cover {
     width: 130px;
     height: 100px;
+  }
+  .article-pagination {
+    margin-top: 15px;
   }
 </style>
