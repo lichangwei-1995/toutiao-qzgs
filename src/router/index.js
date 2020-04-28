@@ -11,6 +11,8 @@ import Article from '@/views/article/'
 import Publish from '@/views/publish/'
 // 素材管理
 import Fodder from '@/views/fodder/'
+// 评论管理
+import Comment from '@/views/comment/'
 
 Vue.use(VueRouter)
 
@@ -43,6 +45,11 @@ const routes = [
         path: '/fodder',
         name: 'fodder',
         component: Fodder
+      },
+      {
+        path: '/comment',
+        name: 'comment',
+        component: Comment
       }
     ]
   }
