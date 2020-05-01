@@ -13,6 +13,10 @@ import Publish from '@/views/publish/'
 import Fodder from '@/views/fodder/'
 // 评论管理
 import Comment from '@/views/comment/'
+// 个人设置
+import Settings from '@/views/settings/'
+// 粉丝管理
+import Fans from '@/views/fans/'
 
 Vue.use(VueRouter)
 
@@ -50,6 +54,16 @@ const routes = [
         path: '/comment',
         name: 'comment',
         component: Comment
+      },
+      {
+        path: '/settings',
+        name: 'settings',
+        component: Settings
+      },
+      {
+        path: '/fans',
+        name: 'fans',
+        component: Fans
       }
     ]
   }
