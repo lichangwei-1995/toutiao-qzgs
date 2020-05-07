@@ -32,3 +32,12 @@ export const upDateUserPhoto = data => {
     data
   })
 }
+
+// 修改用户信息
+export const onUpDateUserProfile = data => {
+  return request({
+    method: 'PATCH',
+    url: '/mp/v1_0/user/profile',
+    data
+  })
+}

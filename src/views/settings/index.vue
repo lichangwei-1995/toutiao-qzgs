@@ -30,7 +30,7 @@
               <el-input v-model="user.email"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="onSubmit">保存</el-button>
+              <el-button type="primary" @click="onSubmit" :loading="upDateUserProfileLoading">保存</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -68,8 +68,18 @@
         >
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="onUpDateImage">确 定</el-button>
+        <el-button
+          @click="dialogVisible = false"
+        >
+          取 消
+        </el-button>
+        <el-button
+          type="primary"
+          @click="onUpDateImage"
+          :loading="upDateUserPhotoLoading"
+        >
+          确 定
+        </el-button>
       </span>
     </el-dialog>
   </div>
@@ -78,8 +88,10 @@
 <script>
 import {
   getUserProfile,
-  upDateUserPhoto
+  upDateUserPhoto,
+  onUpDateUserProfile
 } from '@/api/user'
+
 import 'cropperjs/dist/cropper.css'
 import Cropper from 'cropperjs'
 
@@ -102,7 +114,9 @@ export default {
       user: {},
       dialogVisible: false,
       previewImage: '',
-      cropper: null // 裁切器
+      cropper: null, // 裁切器
+      upDateUserPhotoLoading: false, // 修改头像loading状态
+      upDateUserProfileLoading: false
     }
   },
   computed: {},
@@ -162,6 +176,9 @@ export default {
     },
 
     onUpDateImage() {
+      // 开启loading状态
+      this.upDateUserPhotoLoading = true
+
       this.cropper.getCroppedCanvas().toBlob((file) => {
         const formData = new FormData()
 
@@ -177,12 +194,22 @@ export default {
 
           // 需要服务端参与
           // this.user.photo = res.data.data.photo
+
+          // 关闭loading状态\
+          this.upDateUserPhotoLoading = false
         })
       })
     },
 
     onSubmit() {
-      console.log('submit!')
+      this.upDateUserProfileLoading = true
+      onUpDateUserProfile(this.user).then(res => {
+        this.$message({
+          type: 'success',
+          message: '修改成功'
+        })
+        this.upDateUserProfileLoading = false
+      })
     }
   }
 }
