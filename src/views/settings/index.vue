@@ -10,9 +10,10 @@
       <el-row>
         <el-col :span="12">
           <el-form
-            ref="form"
-            :model="form"
+            ref="settings-form"
+            :model="user"
             label-width="80px"
+            :rules="rules"
           >
             <el-form-item label="编号">
               <el-input v-model="user.id" disabled></el-input>
@@ -20,13 +21,13 @@
             <el-form-item label="手机">
               <el-input v-model="user.mobile" disabled></el-input>
             </el-form-item>
-            <el-form-item label="媒体名称">
+            <el-form-item label="媒体名称" prop="name">
               <el-input v-model="user.name"></el-input>
             </el-form-item>
-            <el-form-item label="媒体介绍">
+            <el-form-item label="媒体介绍" prop="intro">
               <el-input type="textarea" v-model="user.intro"></el-input>
             </el-form-item>
-            <el-form-item label="邮箱">
+            <el-form-item label="邮箱" prop="email">
               <el-input v-model="user.email"></el-input>
             </el-form-item>
             <el-form-item>
@@ -105,7 +106,7 @@ export default {
     return {
       form: {
         name: '',
-        region: '',
+        intro: '',
         date1: '',
         date2: '',
         delivery: false,
@@ -113,12 +114,29 @@ export default {
         resource: '',
         desc: ''
       },
-      user: {},
+      user: {
+        name: '',
+        intro: ''
+      },
       dialogVisible: false,
       previewImage: '',
       cropper: null, // 裁切器
       upDateUserPhotoLoading: false, // 修改头像loading状态
-      upDateUserProfileLoading: false
+      upDateUserProfileLoading: false,
+      // 表单验证
+      rules: {
+        name: [
+          { required: true, message: '请输入媒体名称', trigger: 'blur' },
+          { min: 3, max: 7, message: '长度在 3 到 5 个字符', trigger: 'change' }
+        ],
+        intro: [
+          { required: true, message: '请输入媒体介绍', trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: '请输入邮箱', trigger: 'blur' },
+          { pattern: /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/, message: '请输入正确的邮箱格式', trigger: 'change' }
+        ]
+      }
     }
   },
   computed: {},
@@ -212,14 +230,22 @@ export default {
 
     onSubmit() {
       this.upDateUserProfileLoading = true
-      onUpDateUserProfile(this.user).then(res => {
-        this.$message({
-          type: 'success',
-          message: '修改成功'
-        })
-        this.upDateUserProfileLoading = false
+      this.$refs['settings-form'].validate(valid => {
+        // 验证失败 阻止提交
+        if (!valid) {
+          this.upDateUserProfileLoading = false
+          return
+        }
 
-        globalBus.$emit('update-user', this.user)
+        onUpDateUserProfile(this.user).then(res => {
+          this.$message({
+            type: 'success',
+            message: '修改成功'
+          })
+          this.upDateUserProfileLoading = false
+
+          globalBus.$emit('update-user', this.user)
+        })
       })
     }
   }

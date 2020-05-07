@@ -178,7 +178,7 @@ export default {
         // 判断是请求编辑内容还是直接发布内容
         if (this.$route.query.id) {
           editArticle(this.$route.query.id, this.article, draft).then(res => {
-            console.log(res)
+            // console.log(res)
             this.$message({
               message: `${draft ? '存入草稿' : '发布'}成功`,
               type: 'success'
