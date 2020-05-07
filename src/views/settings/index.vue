@@ -46,10 +46,29 @@
             type="file"
             ref="file"
             hidden
+            @change="onChangeFile"
           >
         </el-col>
       </el-row>
     </el-card>
+
+    <!-- 弹出层 -->
+    <el-dialog
+      title="提示"
+      :visible.sync="dialogVisible"
+      append-to-body
+      width="30%"
+      >
+      <img
+        width="200"
+        :src="previewImage"
+        alt=""
+      >
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -75,7 +94,9 @@ export default {
         resource: '',
         desc: ''
       },
-      user: {}
+      user: {},
+      dialogVisible: false,
+      previewImage: ''
     }
   },
   computed: {},
@@ -89,6 +110,21 @@ export default {
         console.log(res)
         this.user = res.data.data
       })
+    },
+    // 上传图片
+    onChangeFile() {
+      // console.log(111)
+
+      const file = this.$refs.file
+
+      const blobData = window.URL.createObjectURL(file.files[0])
+
+      this.previewImage = blobData
+
+      this.dialogVisible = true
+
+      // 防止选择相同图片时不触发change事件问题
+      this.$refs.file.value = ''
     },
     onSubmit() {
       console.log('submit!')

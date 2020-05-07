@@ -113,7 +113,8 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #999;
+  background-image: url(./beijing.jpg);
+  background-size: cover;
   .login-form {
     padding: 50px 60px;
     background-color: #fff;
