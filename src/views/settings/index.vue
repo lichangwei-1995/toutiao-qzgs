@@ -95,6 +95,8 @@ import {
 import 'cropperjs/dist/cropper.css'
 import Cropper from 'cropperjs'
 
+import globalBus from '@/untils/global-bus'
+
 export default {
   name: 'SettingsIndex',
   components: {},
@@ -197,6 +199,13 @@ export default {
 
           // 关闭loading状态\
           this.upDateUserPhotoLoading = false
+
+          this.$message({
+            type: 'success',
+            message: '修改成功'
+          })
+
+          globalBus.$emit('update-user', this.user)
         })
       })
     },
@@ -209,6 +218,8 @@ export default {
           message: '修改成功'
         })
         this.upDateUserProfileLoading = false
+
+        globalBus.$emit('update-user', this.user)
       })
     }
   }
