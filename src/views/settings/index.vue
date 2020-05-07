@@ -57,16 +57,19 @@
       title="提示"
       :visible.sync="dialogVisible"
       append-to-body
-      width="30%"
+      @opened="onDialogopen"
+      @closed="onDialogclose"
       >
-      <img
-        width="200"
-        :src="previewImage"
-        alt=""
-      >
+      <div class="preview-image-wrap">
+        <img
+          class="preview-image"
+          :src="previewImage"
+          ref="preview-image"
+        >
+      </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="onUpDateImage">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -74,9 +77,11 @@
 
 <script>
 import {
-  getUserProfile
-}
-  from '@/api/user'
+  getUserProfile,
+  upDateUserPhoto
+} from '@/api/user'
+import 'cropperjs/dist/cropper.css'
+import Cropper from 'cropperjs'
 
 export default {
   name: 'SettingsIndex',
@@ -96,7 +101,8 @@ export default {
       },
       user: {},
       dialogVisible: false,
-      previewImage: ''
+      previewImage: '',
+      cropper: null // 裁切器
     }
   },
   computed: {},
@@ -107,7 +113,7 @@ export default {
   methods: {
     loadUser() {
       getUserProfile().then(res => {
-        console.log(res)
+        // console.log(res)
         this.user = res.data.data
       })
     },
@@ -121,11 +127,60 @@ export default {
 
       this.previewImage = blobData
 
+      // 显示弹出层
       this.dialogVisible = true
 
       // 防止选择相同图片时不触发change事件问题
       this.$refs.file.value = ''
     },
+
+    onDialogopen() {
+      const image = this.$refs['preview-image']
+      this.cropper = new Cropper(image, {
+        aspectRatio: 1,
+        viewMode: 1,
+        dragMode: 'move',
+        cropBoxMovable: false,
+        cropBoxResizable: false,
+        background: false,
+        movable: true
+        // crop(event) {
+        //   console.log(event.detail.x)
+        //   console.log(event.detail.y)
+        //   console.log(event.detail.width)
+        //   console.log(event.detail.height)
+        //   console.log(event.detail.rotate)
+        //   console.log(event.detail.scaleX)
+        //   console.log(event.detail.scaleY)
+        // }
+      })
+    },
+
+    onDialogclose() {
+      // 关闭对话框的同时销毁裁切器
+      this.cropper.destroy()
+    },
+
+    onUpDateImage() {
+      this.cropper.getCroppedCanvas().toBlob((file) => {
+        const formData = new FormData()
+
+        formData.append('photo', file)
+
+        upDateUserPhoto(formData).then(res => {
+          // console.log(res)
+          // 关闭弹出框
+          this.dialogVisible = false
+
+          // 本地直接修改
+          this.user.photo = window.URL.createObjectURL(file)
+
+          // 需要服务端参与
+          // this.user.photo = res.data.data.photo
+        })
+      })
+    },
+
     onSubmit() {
       console.log('submit!')
     }
@@ -139,5 +194,13 @@ export default {
     align-items: center;
     flex-direction: column;
     justify-content: center;
+  }
+
+  .preview-image-wrap {
+    .preview-image {
+      display: block;
+      max-width: 100%;
+      height: 200px;
+    }
   }
 </style>
